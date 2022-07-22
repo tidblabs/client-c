@@ -29,6 +29,10 @@ public:
     metapb::Store getStore(uint64_t) override { throw Exception("not implemented", pingcap::ErrorCodes::UnknownError); }
 
     bool isMock() override { return true; }
+
+    uint16_t getTenantID(const std::string &) override { return 0; }
+
+    void deleteTenantID(const std::string &, uint16_t) override {}
 };
 
 } // namespace pd

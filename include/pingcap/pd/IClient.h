@@ -36,6 +36,10 @@ public:
     virtual uint64_t getGCSafePoint() = 0;
 
     virtual bool isMock() = 0;
+
+    virtual uint16_t getTenantID(const std::string & name) = 0;
+
+    virtual void deleteTenantID(const std::string & name, uint16_t id) = 0;
 };
 
 using ClientPtr = std::shared_ptr<IClient>;

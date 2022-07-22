@@ -376,5 +376,51 @@ metapb::Store Client::getStore(uint64_t store_id)
     return response.store();
 }
 
+uint16_t Client::getTenantID(const std::string & name)
+{
+    pdpb::CreateTenantIDRequest request;
+    pdpb::CreateTenantIDResponse response;
+
+    request.set_allocated_header(requestHeader());
+    request.set_name(name);
+
+    grpc::ClientContext context;
+
+    context.set_deadline(std::chrono::system_clock::now() + pd_timeout);
+
+    auto status = leaderClient()->stub->CreateTenantID(&context, request, &response);
+    if (!status.ok())
+    {
+        std::string err_msg = ("get tenant id for '" + name + "' failed: " + std::to_string(status.error_code()) + ": " + status.error_message());
+        log->error(err_msg);
+        check_leader.store(true);
+        throw Exception(err_msg, GRPCErrorCode);
+    }
+    return response.id();
+}
+
+void Client::deleteTenantID(const std::string & name, uint16_t id)
+{
+    pdpb::DeleteTenantIDRequest request;
+    pdpb::DeleteTenantIDResponse response;
+
+    request.set_allocated_header(requestHeader());
+    request.set_name(name);
+    request.set_id(id);
+
+    grpc::ClientContext context;
+
+    context.set_deadline(std::chrono::system_clock::now() + pd_timeout);
+
+    auto status = leaderClient()->stub->DeleteTenantID(&context, request, &response);
+    if (!status.ok())
+    {
+        std::string err_msg = ("delete tenant id " + std::to_string(id) + " for '" + name + "' failed: " + std::to_string(status.error_code()) + ": " + status.error_message());
+        log->error(err_msg);
+        check_leader.store(true);
+        throw Exception(err_msg, GRPCErrorCode);
+    }
+}
+
 } // namespace pd
 } // namespace pingcap

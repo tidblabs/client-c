@@ -52,6 +52,10 @@ public:
 
     bool isMock() override;
 
+    uint16_t getTenantID(const std::string & name) override;
+
+    void deleteTenantID(const std::string & name, uint16_t id) override;
+
 private:
     void initClusterID();
 
